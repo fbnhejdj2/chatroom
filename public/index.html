@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Chat Room</title>
+  <title>Chat Room</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>Simple Chat Room</h1>
-<input id="username" placeholder="Enter your name" />
-<input id="message" placeholder="Type a message" />
-<button onclick="sendMessage()">Send</button>
-<ul id="chat"></ul>
-
-<script src="script.js"></script>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>Chat Room</h2>
+      <a href="/logout">Logout</a>
+    </div>
+    <ul id="chat" class="chat-messages"></ul>
+    <form onsubmit="sendMessage(); return false;">
+      <input id="message" placeholder="Type a message..." autocomplete="off" />
+      <button>Send</button>
+    </form>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
