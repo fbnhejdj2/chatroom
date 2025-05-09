@@ -12,12 +12,10 @@ const PORT = 3000;
 const messagesPath = path.join(__dirname, 'messages.json');
 let messages = [];
 
-// Load existing messages
 if (fs.existsSync(messagesPath)) {
   try {
     messages = JSON.parse(fs.readFileSync(messagesPath, 'utf8'));
-  } catch (err) {
-    console.error('Error reading messages.json:', err);
+  } catch {
     messages = [];
   }
 } else {
@@ -32,18 +30,22 @@ app.get('/login', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('User connected');
   socket.emit('chatHistory', messages);
 
-  socket.on('chatMessage', (msg) => {
-    messages.push(msg);
+  socket.on('chatMessage', (data) => {
+    if (!data.username || !data.message) return;
+    const chatMessage = {
+      username: data.username,
+      message: data.message
+    };
+    messages.push(chatMessage);
     fs.writeFile(messagesPath, JSON.stringify(messages, null, 2), (err) => {
-      if (err) console.error('Failed to write messages:', err);
+      if (err) console.error('Write error:', err);
     });
-    io.emit('chatMessage', msg);
+    io.emit('chatMessage', chatMessage);
   });
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
