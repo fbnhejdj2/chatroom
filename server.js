@@ -1,86 +1,49 @@
 const express = require('express');
+const http = require('http');
 const fs = require('fs');
+const socketIO = require('socket.io');
 const path = require('path');
-const session = require('express-session');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const server = http.createServer(app);
+const io = socketIO(server);
+const PORT = 3000;
 
-const USERS_FILE = path.join(__dirname, 'users.json');
-const MESSAGES_FILE = path.join(__dirname, 'messages.json');
-
+const messagesPath = path.join(__dirname, 'messages.json');
 let messages = [];
-let clients = [];
 
-if (fs.existsSync(MESSAGES_FILE)) {
-  messages = JSON.parse(fs.readFileSync(MESSAGES_FILE, 'utf8') || '[]');
-}
-
-app.use(express.static('public'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use(session({
-  secret: 'discord-style-chat-secret',
-  resave: false,
-  saveUninitialized: true
-}));
-
-// Auth middleware
-function isAuthenticated(req, res, next) {
-  if (req.session && req.session.user) return next();
-  res.redirect('/login.html');
-}
-
-// Login
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-  const user = users.find(u => u.username === username && u.password === password);
-
-  if (user) {
-    req.session.user = username;
-    res.redirect('/');
-  } else {
-    res.send('Login failed. <a href="/login.html">Try again</a>');
+// Load existing messages
+if (fs.existsSync(messagesPath)) {
+  try {
+    messages = JSON.parse(fs.readFileSync(messagesPath, 'utf8'));
+  } catch (err) {
+    console.error('Error reading messages.json:', err);
+    messages = [];
   }
+} else {
+  fs.writeFileSync(messagesPath, JSON.stringify([]));
+}
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Logout
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/login.html'));
-});
+io.on('connection', (socket) => {
+  console.log('User connected');
+  socket.emit('chatHistory', messages);
 
-// Serve chat page only if logged in
-app.get('/', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
-});
-
-app.get('/events', isAuthenticated, (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
-
-  clients.push(res);
-  messages.forEach(msg => res.write(`data: ${JSON.stringify(msg)}\n\n`));
-
-  req.on('close', () => {
-    clients = clients.filter(c => c !== res);
+  socket.on('chatMessage', (msg) => {
+    messages.push(msg);
+    fs.writeFile(messagesPath, JSON.stringify(messages, null, 2), (err) => {
+      if (err) console.error('Failed to write messages:', err);
+    });
+    io.emit('chatMessage', msg);
   });
 });
 
-app.post('/message', isAuthenticated, (req, res) => {
-  const msg = {
-    user: req.session.user,
-    text: req.body.text,
-    time: new Date().toLocaleTimeString()
-  };
-  messages.push(msg);
-
-  fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2));
-  clients.forEach(client => client.write(`data: ${JSON.stringify(msg)}\n\n`));
-  res.sendStatus(200);
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
-
-app.listen(PORT, () => console.log(`Chat server running on port ${PORT}`));
