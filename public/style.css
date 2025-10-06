@@ -1,3 +1,46 @@
+/* Chrome-style tabs */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #444;
+  margin-bottom: 1em;
+}
+.tab {
+  background: #23272a;
+  border: none;
+  outline: none;
+  color: #fff;
+  padding: 10px 30px;
+  cursor: pointer;
+  font-size: 1em;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  margin-right: 2px;
+  transition: background 0.2s;
+}
+.tab.active {
+  background: #36393f;
+  border-bottom: 2px solid #2c2f33;
+  color: #7289da;
+}
+.tab .badge {
+  background: #ff4d4d;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.home-header {
+  margin-bottom: 1em;
+}
+.coming-soon {
+  background: #23272a;
+  border-radius: 8px;
+  padding: 2em;
+  text-align: center;
+  color: #888;
+}
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
@@ -12,10 +55,46 @@ body {
   height: 100vh;
 }
 
-form {
+.login-card {
   background: #23272a;
-  padding: 2em;
-  border-radius: 8px;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  width: 360px;
+}
+
+form {
+  background: transparent;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.brand .logo {
+  font-size: 2rem;
+}
+.brand h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.field {
+  margin-bottom: 0.75rem;
+}
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  color: #bdbdbd;
+  margin-bottom: 0.25rem;
+}
+.error {
+  color: #ff6b6b;
+  margin-top: 0.75rem;
+  min-height: 1.2em;
 }
 
 input, button {
@@ -24,11 +103,16 @@ input, button {
   width: 100%;
   border: none;
   border-radius: 4px;
+  background: transparent;
+  color: inherit;
 }
 
-button {
+button.primary {
+  margin-top: 10px;
   background-color: #7289da;
+  border: none;
   color: white;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -44,17 +128,23 @@ button {
   align-items: center;
 }
 
-.chat-messages {
-  list-style: none;
-  padding: 0;
+
+.chat-box {
   max-height: 400px;
   overflow-y: auto;
   margin-bottom: 1em;
+  background: #23272a;
+  border-radius: 8px;
+  padding: 1em;
 }
 
 .message {
-  padding: 5px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: #36393f;
+  border-radius: 4px;
   border-bottom: 1px solid #444;
+  word-break: break-word;
 }
 
 .timestamp {

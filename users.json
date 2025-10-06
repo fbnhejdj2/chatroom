@@ -1,4 +1,26 @@
 [
-  { "username": "admin", "password": "admin123" },
-  { "username": "user1", "password": "pass1" }
+  {
+    "username": "admin",
+    "password": "admin123"
+  },
+  {
+    "username": "user1",
+    "password": "pass1"
+  },
+  {
+    "username": "caeden",
+    "password": "caeden123"
+  },
+  {
+    "username": "gg",
+    "password": "gg",
+    "question": "school",
+    "answer": "hhh"
+  },
+  {
+    "username": "admin1",
+    "password": "admin123",
+    "question": "pet",
+    "answer": "sarah"
+  }
 ]

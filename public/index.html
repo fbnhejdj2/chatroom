@@ -7,56 +7,52 @@
 </head>
 <body>
   <div class="chat-container">
-    <h2>Chatroom</h2>
-    <div id="messages" class="chat-box"></div>
-    <form id="message-form">
-      <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" required />
-      <button type="submit">Send</button>
-    </form>
-    <button id="logout-button">Logout</button>
+    <div class="tabs">
+      <button class="tab active" id="chat-tab">Chatroom</button>
+      <button class="tab" id="home-tab">Home</button>
+    </div>
+    <div id="chatroom-content">
+      <div class="chat-header">
+        <h2>Chatroom</h2>
+        <span id="user-count">Active users: 0</span>
+      </div>
+      <div id="typing-indicator" style="font-size:0.9em; color:#666; margin:6px 0; display:none;">Someone is typing...</div>
+      <div id="messages" class="chat-box"></div>
+      <form id="message-form">
+        <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" required />
+        <button type="submit">Send</button>
+      </form>
+      <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+        <button id="logout-button">Logout</button>
+        <!-- admin clear button; hidden by default, revealed via client JS when admin is logged in -->
+        <button id="clear-messages-button" style="display:none; background:#a33; color:white; padding:8px; border-radius:6px;">Clear All Messages</button>
+      </div>
+    </div>
+    <div id="home-content" style="display:none;">
+      <div class="home-header">
+        <h2>Home</h2>
+      </div>
+      <div class="search-card">
+        <h3>Scram Jet Search / Proxy</h3>
+        <input type="text" id="search-input" placeholder="Search messages or users..." />
+        <button id="search-button">Search</button>
+        <div id="search-results"></div>
+        <div id="scramjet-readme" style="white-space:pre-wrap; margin-top:1em; display:block; background:#1f2124; padding:10px; border-radius:6px; color:#ddd; max-height:300px; overflow:auto;">
+          Loading Scram Jet README...
+        </div>
+        <hr />
+        <h4>Proxy a site</h4>
+        <input type="text" id="proxy-input" placeholder="https://example.com" />
+        <button id="proxy-view">Open in proxy view</button>
+        <div id="proxy-iframe" style="margin-top:1em; border:1px solid #444; height:400px; overflow:auto;"></div>
+      </div>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const username = localStorage.getItem('username');
-    const messageForm = document.getElementById('message-form');
-    const messageInput = document.getElementById('message-input');
-    const messagesDiv = document.getElementById('messages');
-    const logoutButton = document.getElementById('logout-button');
-
-    if (!username) {
-      window.location.href = '/login';
-    }
-
-    function addMessageToChat(data) {
-      const div = document.createElement('div');
-      div.textContent = `${data.username}: ${data.message}`;
-      messagesDiv.appendChild(div);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    socket.on('chatHistory', (messages) => {
-      messages.forEach(addMessageToChat);
-    });
-
-    socket.on('chatMessage', (data) => {
-      addMessageToChat(data);
-    });
-
-    messageForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const message = messageInput.value.trim();
-      if (message) {
-        socket.emit('chatMessage', { username, message });
-        messageInput.value = '';
-      }
-    });
-
-    logoutButton.addEventListener('click', () => {
-      localStorage.removeItem('username');
-      window.location.href = '/login';
-    });
-  </script>
+  <script src="/script.js"></script>
+  <!-- hidden audio to play on new messages -->
+  <audio id="notif-sound" src="/uv/t.txt" preload="auto" style="display:none;"></audio>
+  <div id="toast-container" style="position:fixed; right:12px; bottom:12px; z-index:9999;"></div>
 </body>
 </html>
